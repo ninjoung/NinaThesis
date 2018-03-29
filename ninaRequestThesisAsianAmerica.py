@@ -6,15 +6,18 @@ import json, sys, os, csv
 def dumpJsonAry(jsons, filename):
     with open(filename, "w", encoding='utf-8') as file:
          json.dump(jsons, file, indent=4, sort_keys=True, ensure_ascii=False)
-    print("jsons dumped to {}".format(filename))
+    print("created new json file: {}".format(filename))
 
 with open(sys.argv[1], 'r', encoding='utf-8') as f:
     posts = json.load(f)
 print('file opened')
 
 
-posts.pop(0)
-posts_length = len(posts) - 1
+assert (len(posts) != 0), 'posts cannot be empty'
+if('metadata' in posts[0]):
+    print("Post contains metadata tag. First element in list removed")
+    posts.pop(0)
+
 target_tags = {11304, 2788, 2912, 3506, 3508, 5580, 5581, 5602, 5808, 8340, 9053, 12368, 12370, 13026, 14377, 15344, 15862, 16313, 17399, 21776, 21777,
                22144, 5311, 5324,
                4335, 6545, 6930, 7406, 11294, 12046, 17980, 18485, 18802, 18872, 21525,
@@ -95,11 +98,11 @@ for x in posts:
     if(isMatch == True):
         data.append(x)
 
-# dumpJsonAry(data, "dataRequest_Thesis_AsAmer{}.json".format(len(data)))
-dumpJsonAry(data, os.path.expanduser( "~/Desktop/enigmadailydata/requestResultsThesis/json/dataRequest_Thesis_AsAmer{}.json".format(len(data))))
+dumpJsonAry(data, "dataRequest_Thesis_AsAmer{}.json".format(len(data)))
+# dumpJsonAry(data, os.path.expanduser( "~/Desktop/enigmadailydata/requestResultsThesis/json/dataRequest_Thesis_AsAmer{}.json".format(len(data))))
 
-# with open('ThesisAsAmer{}.csv'.format(len(data)), 'w', encoding='utf-8', newline='') as csvfile:
-with open(os.path.expanduser('~/Desktop/enigmadailydata/requestResultsThesis/csv/ThesisAsAmer{}.csv'.format(len(data))), 'w', encoding='utf-8', newline='') as csvfile:
+with open('ThesisAsAmer{}.csv'.format(len(data)), 'w', encoding='utf-8', newline='') as csvfile:
+# with open(os.path.expanduser('~/Desktop/enigmadailydata/requestResultsThesis/csv/ThesisAsAmer{}.csv'.format(len(data))), 'w', encoding='utf-8', newline='') as csvfile:
     fieldnames = ['post_id', 'date', 'title', 'author', 'sentiment_score', 'sentiment_magnitude', 'link', 'matched_tags', 'matched_entities']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
@@ -119,3 +122,5 @@ with open(os.path.expanduser('~/Desktop/enigmadailydata/requestResultsThesis/csv
         csvRow['matched_tags'] = x['filtering']['matched_tags']
         csvRow['matched_entities'] = ','.join(x['filtering']['matched_entities'])
         writer.writerow(csvRow)
+
+    print("created new csv file: {}".format(csvfile.name))
